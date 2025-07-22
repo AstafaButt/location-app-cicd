@@ -1,36 +1,25 @@
-# Dockerfile.apache
+# Use the PHP 8.2 Apache image
 FROM php:8.2-apache
 
-# Enable Apache mod_rewrite
+# Accept UID and GID as build arguments
+ARG UID=1000
+ARG GID=1000
+
+# Enable Apache rewrite module
 RUN a2enmod rewrite
 
-# Install system dependencies and PHP extensions
-RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev unzip git curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mysqli
+# Install MySQL PDO driver
+RUN docker-php-ext-install pdo pdo_mysql
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy Laravel project into container
+# Copy Laravel application
 COPY . .
 
-# Set Apache DocumentRoot to Laravel's /public
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
+# Fix permissions using UID and GID
+RUN addgroup --gid ${GID} appgroup \
+    && useradd -u ${UID} -g appgroup -m appuser \
+    && chown -R appuser:appgroup storage bootstrap/cache
 
-# Enable .htaccess override for Laravel
-RUN echo '<Directory /var/www/html/public>\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>' >> /etc/apache2/apache2.conf
-
-# Fix permissions (dev-safe defaults)
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Install Composer globally
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
+USER appuser

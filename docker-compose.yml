@@ -6,10 +6,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        UID: "${UID}"
+        GID: "${GID}"
     volumes:
       - laravel-data:/app
     networks:
       - location-network
+    
 
   # NGINX to serve Laravel via PHP-FPM
   nginx:
@@ -23,16 +27,24 @@ services:
       - php
     networks:
       - location-network
+
   apache:
     build:
       context: .
-      dockerfile: Dockerfile.apache  # Apache version
+      dockerfile: Dockerfile.apache
+      args:
+        UID: "${UID}"
+        GID: "${GID}"
+    ports:
+      - 8082:80
     volumes:
       - laravel-data:/var/www/html
-    ports:
-      - 8082:80   # Apache on port 8082
+      - ./apache/vhost.conf:/etc/apache2/sites-available/000-default.conf
     networks:
       - location-network
+    
+
+
 
   # MySQL Database
   sql-db:
