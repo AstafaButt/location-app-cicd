@@ -1,0 +1,38 @@
+name: location-app-2
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  laravel-ci:
+    runs-on: ubuntu-latest
+
+    steps:  
+    - name: Code Checkout  
+      uses: actions/checkout@v4  
+    
+    - name: Docker Hub Login  
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin  
+    
+    - name: Build Docker Image  
+      run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/location-app-2:latest" .  
+    
+    - name: Push Docker Image  
+      run: docker push "${{ secrets.DOCKERHUB_USERNAME }}/location-app-2:latest"  
+    
+    - name: Deploy to EC2 via SSH  
+      uses: appleboy/ssh-action@v1.0.0  
+      with:  
+        host: ${{ secrets.EC2_HOST }}  
+        username: ${{ secrets.EC2_USER }}  
+        key: ${{ secrets.EC2_KEY }}  
+        script: |  
+          cd ${{ secrets.EC2_PROJECT_DIR }}  
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/location-app-2:latest  
+          docker compose down  
+          docker compose up -d --build
