@@ -5,6 +5,7 @@ services:
     image: astafa/location-app-cicd:latest
     volumes:
       - laravel-data:/app
+      - ./.env:/app/.env  
     networks:
       - location-network
     depends_on:
