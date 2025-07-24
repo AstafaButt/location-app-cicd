@@ -25,6 +25,7 @@ WORKDIR /app
 # Copy application files into the container
 COPY . .
 
+# Set folder permissions
 RUN chmod -R 777 /app/storage /app/bootstrap/cache
 
 # Install Laravel dependencies

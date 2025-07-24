@@ -3,9 +3,7 @@ version: '3.8'
 services:
   # PHP + Laravel (using your Dockerfile)
   php:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: astafa/location-app-cicd:latest
     volumes:
       - laravel-data:/app
     networks:
