@@ -25,6 +25,8 @@ WORKDIR /app
 # Copy application files into the container
 COPY . .
 
+RUN chmod -R 777 /app/storage /app/bootstrap/cache
+
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
 
