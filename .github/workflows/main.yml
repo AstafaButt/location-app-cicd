@@ -20,10 +20,10 @@ jobs:
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin  
     
     - name: Build Docker Image  
-      run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/location-app-2:latest" .  
+      run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/location-app-cicd:latest" .  
     
     - name: Push Docker Image  
-      run: docker push "${{ secrets.DOCKERHUB_USERNAME }}/location-app-2:latest"  
+      run: docker push "${{ secrets.DOCKERHUB_USERNAME }}/location-app-cicd:latest"  
     
     - name: Deploy to EC2 via SSH  
       uses: appleboy/ssh-action@v1.0.0  
@@ -33,6 +33,6 @@ jobs:
         key: ${{ secrets.EC2_KEY }}  
         script: |  
           cd ${{ secrets.EC2_PROJECT_DIR }}  
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/location-app-2:latest  
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/location-app-cicd:latest  
           docker compose down  
           docker compose up -d --build
