@@ -14,7 +14,8 @@ RUN apk add --no-cache \
     unzip \
     bash \
     git \
-    curl
+    curl \
+    shadow  # needed for usermod/usermod-style commands
 
 # Configure GD extension for image processing
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -22,6 +23,12 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Create user and group with specified UID/GID
+RUN addgroup -g ${GID} appgroup \
+    && adduser -D -G appgroup -u ${UID} appuser \
+    && mkdir -p /app/storage /app/bootstrap/cache \
+    && chown -R appuser:appgroup /app
 
 # Set working directory
 WORKDIR /app
@@ -32,8 +39,11 @@ COPY . .
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions using UID and GID
+# Set permissions again after copying
+RUN chown -R appuser:appgroup /app
 
+# Switch to non-root user (optional but recommended)
+USER appuser
 
 # Expose port
 EXPOSE 8181
