@@ -36,6 +36,7 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/location-app-cicd:latest
           docker compose down
           docker compose up -d --build
-          docker compose exec php chmod -R 775 storage bootstrap/cache
+          docker compose exec php chmod -R ug+rw storage bootstrap/cache
+          docker compose exec php chown -R www-data:www-data storage bootstrap/cache
           docker compose exec php php artisan migrate --force
           docker compose exec php php artisan config:cache
