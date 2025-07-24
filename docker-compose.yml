@@ -6,9 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        UID: "${UID}"
-        GID: "${GID}"
     volumes:
       - laravel-data:/app
     networks:
@@ -27,22 +24,6 @@ services:
       - php
     networks:
       - location-network
-
-  apache:
-    build:
-      context: .
-      dockerfile: Dockerfile.apache
-      args:
-        UID: "${UID}"
-        GID: "${GID}"
-    ports:
-      - 8082:80
-    volumes:
-      - laravel-data:/var/www/html
-      - ./apache/vhost.conf:/etc/apache2/sites-available/000-default.conf
-    networks:
-      - location-network
-    
 
 
 
