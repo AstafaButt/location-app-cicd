@@ -30,11 +30,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Set permissions using UID and GID
-RUN addgroup -g ${GID} appgroup \
-    && adduser -D -G appgroup -u ${UID} appuser \
-    && chown -R appuser:appgroup /app/storage /app/bootstrap/cache
 
-USER appuser
 
 # Expose port
 EXPOSE 8181
