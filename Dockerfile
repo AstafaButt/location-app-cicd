@@ -1,6 +1,9 @@
 # Use the PHP 8.2 FPM Alpine image as the base
 FROM php:8.2-fpm-alpine
 
+# Accept UID and GID as build arguments
+ARG UID=1000
+ARG GID=1000
 
 # Install required extensions and tools
 RUN apk add --no-cache \
