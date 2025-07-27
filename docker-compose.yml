@@ -23,7 +23,7 @@ services:
       php artisan view:cache && \
       mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache && \
       chmod -R 777 storage bootstrap/cache && \
-      php artisan migrate && \
+      php artisan migrate --force && \
       php-fpm"
 
   nginx:
